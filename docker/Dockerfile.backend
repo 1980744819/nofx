@@ -17,6 +17,7 @@ ARG REPO=192.168.1.7:30002/base
 FROM ${REPO}/alpine:${ALPINE_VERSION} AS ta-lib-builder
 ARG TA_LIB_VERSION
 
+COPY repositories/ /etc/apk/repositories
 RUN apk update && apk add --no-cache \
     wget tar make gcc g++ musl-dev autoconf automake
 
@@ -39,6 +40,7 @@ RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-${TA_LIB_VERSION}-src.
 # ──────────────────────────────────────────────────────────────
 FROM ${REPO}/golang:${GO_VERSION} AS backend-builder
 
+COPY repositories/ /etc/apk/repositories
 RUN apk update && apk add --no-cache git make gcc g++ musl-dev
 
 COPY --from=ta-lib-builder /usr/local /usr/local
@@ -57,6 +59,7 @@ RUN CGO_ENABLED=1 GOOS=linux \
 # ──────────────────────────────────────────────────────────────
 FROM ${REPO}/alpine:${ALPINE_VERSION}
 
+COPY repositories/ /etc/apk/repositories
 RUN apk update && apk add --no-cache ca-certificates tzdata sqlite
 
 COPY --from=ta-lib-builder /usr/local /usr/local

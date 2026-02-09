@@ -1,0 +1,11 @@
+# 清华大学开源软件镜像站 - Alpine Linux 软件源
+# https://mirrors.tuna.tsinghua.edu.cn/help/alpine/
+
+# Alpine Linux 3.18+
+https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.18/main
+https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.18/community
+
+# 如果使用 Edge 版本
+# https://mirrors.tuna.tsinghua.edu.cn/alpine/edge/main
+# https://mirrors.tuna.tsinghua.edu.cn/alpine/edge/community
+# https://mirrors.tuna.tsinghua.edu.cn/alpine/edge/testing
