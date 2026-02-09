@@ -7,23 +7,23 @@ backend:
     repository: 47.121.29.125:30002/nofx/backend
     tag: latest
     pullPolicy: IfNotPresent
-  
+
   # Service configuration
   service:
     type: ClusterIP
     port: 8080
-  
+
   # Container ports
   containerPorts:
     api: 8080
     profiling: 6060
-  
+
   # Environment variables
   env:
     TZ: Asia/Shanghai
     AI_MAX_TOKENS: 8000
     # Add other environment variables here
-  
+
   # Persistent storage
   persistence:
     enabled: true
@@ -31,7 +31,7 @@ backend:
     accessModes:
       - ReadWriteOnce
     storageClass: "local-storage-nvme"
-  
+
   # Resources
   resources:
     requests:
@@ -40,7 +40,7 @@ backend:
     limits:
       cpu: 2
       memory: 4Gi
-  
+
   # Health check
   healthCheck:
     enabled: true
@@ -57,17 +57,17 @@ frontend:
     repository: 47.121.29.125:30002/nofx/frontend
     tag: latest
     pullPolicy: IfNotPresent
-  
+
   # Service configuration
   service:
     type: NodePort
     port: 80
     nodePort: 31000
-  
+
   # Container ports
   containerPorts:
     http: 80
-  
+
   # Resources
   resources:
     requests:
@@ -76,7 +76,7 @@ frontend:
     limits:
       cpu: 1
       memory: 1Gi
-  
+
   # Health check
   healthCheck:
     enabled: true
@@ -90,8 +90,7 @@ frontend:
 ingress:
   enabled: false
   className: ""
-  annotations:
-    {}  # Add annotations here
+  annotations: {} # Add annotations here
   hosts:
     - host: nofx.example.com
       paths:
@@ -102,8 +101,7 @@ ingress:
               name: nofx-frontend
               port:
                 number: 80
-  tls:
-    []  # Add TLS configuration here
+  tls: [] # Add TLS configuration here
 
 # Network Policy
 networkPolicy:
@@ -115,8 +113,8 @@ rbac:
 
 # Service Account
 serviceAccount:
-  create: true
-  name: ""
+  create: false
+  name: "my-jenkins"
 
 # Pod Security Context
 podSecurityContext:
@@ -129,8 +127,6 @@ containerSecurityContext:
   runAsNonRoot: true
 
 # Additional volumes and volume mounts
-volumes:
-  []
+volumes: []
 
-volumeMounts:
-  []
+volumeMounts: []
