@@ -1,0 +1,136 @@
+# NOFX Helm Chart Configuration
+
+# Backend Service Configuration
+backend:
+  # Image configuration
+  image:
+    repository: 47.121.29.125:30002/nofx/backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  
+  # Service configuration
+  service:
+    type: ClusterIP
+    port: 8080
+  
+  # Container ports
+  containerPorts:
+    api: 8080
+    profiling: 6060
+  
+  # Environment variables
+  env:
+    TZ: Asia/Shanghai
+    AI_MAX_TOKENS: 8000
+    # Add other environment variables here
+  
+  # Persistent storage
+  persistence:
+    enabled: true
+    size: 20Gi
+    accessModes:
+      - ReadWriteOnce
+    storageClass: "local-storage-nvme"
+  
+  # Resources
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2
+      memory: 4Gi
+  
+  # Health check
+  healthCheck:
+    enabled: true
+    initialDelaySeconds: 60
+    periodSeconds: 30
+    timeoutSeconds: 10
+    successThreshold: 1
+    failureThreshold: 3
+
+# Frontend Service Configuration
+frontend:
+  # Image configuration
+  image:
+    repository: 47.121.29.125:30002/nofx/frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  
+  # Service configuration
+  service:
+    type: NodePort
+    port: 80
+    nodePort: 31000
+  
+  # Container ports
+  containerPorts:
+    http: 80
+  
+  # Resources
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 1
+      memory: 1Gi
+  
+  # Health check
+  healthCheck:
+    enabled: true
+    initialDelaySeconds: 5
+    periodSeconds: 30
+    timeoutSeconds: 10
+    successThreshold: 1
+    failureThreshold: 3
+
+# Ingress Configuration
+ingress:
+  enabled: false
+  className: ""
+  annotations:
+    {}  # Add annotations here
+  hosts:
+    - host: nofx.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: nofx-frontend
+              port:
+                number: 80
+  tls:
+    []  # Add TLS configuration here
+
+# Network Policy
+networkPolicy:
+  enabled: false
+
+# RBAC
+rbac:
+  create: false
+
+# Service Account
+serviceAccount:
+  create: true
+  name: ""
+
+# Pod Security Context
+podSecurityContext:
+  fsGroup: 1000
+  runAsUser: 1000
+
+# Container Security Context
+containerSecurityContext:
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+
+# Additional volumes and volume mounts
+volumes:
+  []
+
+volumeMounts:
+  []

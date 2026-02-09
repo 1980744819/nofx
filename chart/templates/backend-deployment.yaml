@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "nofx.fullname" . }}-backend
+  labels:
+    {{- include "nofx.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "nofx.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: backend
+  template:
+    metadata:
+      {{- with .Values.backend.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "nofx.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: backend
+    spec:
+      {{- if .Values.serviceAccount.create }}
+      serviceAccountName: {{ include "nofx.serviceAccountName" . }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: nofx-backend
+          image: {{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          {{- with .Values.containerSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: api
+              containerPort: {{ .Values.backend.containerPorts.api }}
+              protocol: TCP
+            - name: profiling
+              containerPort: {{ .Values.backend.containerPorts.profiling }}
+              protocol: TCP
+          {{- if .Values.backend.healthCheck.enabled }}
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: api
+            initialDelaySeconds: {{ .Values.backend.healthCheck.initialDelaySeconds }}
+            periodSeconds: {{ .Values.backend.healthCheck.periodSeconds }}
+            timeoutSeconds: {{ .Values.backend.healthCheck.timeoutSeconds }}
+            successThreshold: {{ .Values.backend.healthCheck.successThreshold }}
+            failureThreshold: {{ .Values.backend.healthCheck.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: api
+            initialDelaySeconds: {{ .Values.backend.healthCheck.initialDelaySeconds }}
+            periodSeconds: {{ .Values.backend.healthCheck.periodSeconds }}
+            timeoutSeconds: {{ .Values.backend.healthCheck.timeoutSeconds }}
+            successThreshold: {{ .Values.backend.healthCheck.successThreshold }}
+            failureThreshold: {{ .Values.backend.healthCheck.failureThreshold }}
+          {{- end }}
+          env:
+            {{- range $key, $value := .Values.backend.env }}
+            - name: {{ $key }}
+              value: "{{ $value }}"
+            {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+            {{- range .Values.volumeMounts }}
+            - {{ toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.backend.resources | nindent 12 }}
+      volumes:
+        - name: data
+          {{- if .Values.backend.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "nofx.fullname" . }}-backend
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        {{- range .Values.volumes }}
+        - {{ toYaml . | nindent 8 }}
+        {{- end }}
+      restartPolicy: Always

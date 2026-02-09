@@ -1,0 +1,17 @@
+apiVersion: v2
+name: nofx
+version: 0.1.0
+description: NOFX - Open Source AI Trading OS
+keywords:
+  - trading
+  - ai
+  - cryptocurrency
+  - finance
+home: https://nofxai.com
+sources:
+  - https://github.com/NoFxAiOS/nofx
+maintainers:
+  - name: NOFX Team
+    email: info@nofxai.com
+appVersion: "latest"
+icon: https://nofxai.com/favicon.ico

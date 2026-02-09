@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "nofx.fullname" . }}-frontend
+  labels:
+    {{- include "nofx.labels" . | nindent 4 }}
+    app.kubernetes.io/component: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "nofx.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: frontend
+  template:
+    metadata:
+      {{- with .Values.frontend.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "nofx.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: frontend
+    spec:
+      {{- if .Values.serviceAccount.create }}
+      serviceAccountName: {{ include "nofx.serviceAccountName" . }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: nofx-frontend
+          image: {{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}
+          imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
+          {{- with .Values.containerSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.frontend.containerPorts.http }}
+              protocol: TCP
+          {{- if .Values.frontend.healthCheck.enabled }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: {{ .Values.frontend.healthCheck.initialDelaySeconds }}
+            periodSeconds: {{ .Values.frontend.healthCheck.periodSeconds }}
+            timeoutSeconds: {{ .Values.frontend.healthCheck.timeoutSeconds }}
+            successThreshold: {{ .Values.frontend.healthCheck.successThreshold }}
+            failureThreshold: {{ .Values.frontend.healthCheck.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: {{ .Values.frontend.healthCheck.initialDelaySeconds }}
+            periodSeconds: {{ .Values.frontend.healthCheck.periodSeconds }}
+            timeoutSeconds: {{ .Values.frontend.healthCheck.timeoutSeconds }}
+            successThreshold: {{ .Values.frontend.healthCheck.successThreshold }}
+            failureThreshold: {{ .Values.frontend.healthCheck.failureThreshold }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.frontend.resources | nindent 12 }}
+      restartPolicy: Always
