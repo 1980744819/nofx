@@ -19,10 +19,10 @@ backend:
     profiling: 6060
 
   # Environment variables
-  env:
-    TZ: Asia/Shanghai
-    AI_MAX_TOKENS: 8000
-    # Add other environment variables here
+  # env:
+  #   TZ: Asia/Shanghai
+  #   AI_MAX_TOKENS: 8000
+  # Add other environment variables here
 
   # Persistent storage
   persistence:
@@ -130,3 +130,10 @@ containerSecurityContext:
 volumes: []
 
 volumeMounts: []
+
+# ConfigMap configuration
+configMap:
+  enabled: true
+  name: nofx-env
+  mountPath: /app/.env
+  subPath: .env
