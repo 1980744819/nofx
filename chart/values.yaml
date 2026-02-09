@@ -113,8 +113,8 @@ rbac:
 
 # Service Account
 serviceAccount:
-  create: false
-  name: "my-jenkins"
+  create: true
+  name: "nofx"
 
 # Pod Security Context
 podSecurityContext:
