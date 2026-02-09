@@ -7,11 +7,12 @@
 
 ARG NODE_VERSION=20-alpine
 ARG NGINX_VERSION=alpine
+ARG REPO=192.168.1.7:30002/base
 
 # ──────────────────────────────────────────────────────────────
 # Build Stage (Node)
 # ──────────────────────────────────────────────────────────────
-FROM node:${NODE_VERSION} AS builder
+FROM ${REPO}/node:${NODE_VERSION} AS builder
 WORKDIR /build
 
 COPY web/package*.json ./
@@ -23,7 +24,7 @@ RUN npm run build
 # ──────────────────────────────────────────────────────────────
 # Runtime Stage (Nginx)
 # ──────────────────────────────────────────────────────────────
-FROM nginx:${NGINX_VERSION}
+FROM ${REPO}/nginx:${NGINX_VERSION}
 
 COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /build/dist /usr/share/nginx/html
