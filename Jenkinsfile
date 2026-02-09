@@ -146,7 +146,7 @@ pipeline {
                     sh '''
                     set -euo pipefail
 
-                    helm upgrade --install nofx ./nofx-chart \
+                    helm upgrade --install nofx ./chart \
                         --namespace ${NAMESPACE} --create-namespace \
                         --set backend.image.repository=${BACK_IMAGE_REPO} \
                         --set backend.image.tag=${IMAGE_TAG} \
