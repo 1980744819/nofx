@@ -222,6 +222,9 @@ func (s *Server) setupRoutes() {
 			s.registerBacktestRoutes(backtest)
 		}
 	}
+
+	// Proxy routes
+	s.router.GET("/proxy/nofxos/*path", proxyNofxosData)
 }
 
 // handleHealth Health check
